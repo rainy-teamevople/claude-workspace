@@ -1,0 +1,35 @@
+name: Sync Portfolio to Public Repo
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'portfolio/**'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout claude-workspace
+        uses: actions/checkout@v4
+
+      - name: Push portfolio to teamevople-portfolio
+        run: |
+          git config --global user.email "rainy@teamevople.kr"
+          git config --global user.name "rainy-teamevople"
+
+          git clone https://x-access-token:${{ secrets.PORTFOLIO_DEPLOY_TOKEN }}@github.com/rainy-teamevople/teamevople-portfolio.git /tmp/portfolio-repo
+
+          # 기존 html/이미지 파일 동기화
+          rsync -av --delete \
+            --exclude='.git' \
+            --exclude='.gitignore' \
+            --exclude='README.md' \
+            portfolio/ /tmp/portfolio-repo/
+
+          cd /tmp/portfolio-repo
+          git add .
+
+          # 변경사항 있을 때만 커밋
+          git diff --staged --quiet || git commit -m "sync: update from claude-workspace @ $(date -u '+%Y-%m-%d %H:%M UTC')"
+          git push origin main
