@@ -1,0 +1,26 @@
+# ── 환경변수 / 인증 정보 ──────────────────────────
+.env
+.env.*
+*.key
+*.pem
+id_rsa
+id_ed25519
+credentials
+credentials.json
+
+# ── 회사 기밀 문서 ────────────────────────────────
+Docs/*.pdf
+
+# ── PDF에서 임시 추출한 이미지 (작업용) ─────────────
+portfolio/images/p*_Im*.png
+
+# ── 임시/캐시 파일 ───────────────────────────────
+weather.txt
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+Thumbs.db
+
+# ── 로그 ─────────────────────────────────────────
+*.log
