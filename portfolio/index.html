@@ -20,6 +20,20 @@
       --text-sub: #8892a4;
       --border: rgba(255,255,255,0.07);
       --card: rgba(255,255,255,0.04);
+      --nav-bg: rgba(10,12,16,0.85);
+      --shadow: rgba(0,0,0,0.4);
+    }
+
+    [data-theme="light"] {
+      --bg: #ffffff;
+      --bg2: #f5f7ff;
+      --bg3: #edf0fb;
+      --text: #0f172a;
+      --text-sub: #64748b;
+      --border: rgba(0,0,0,0.08);
+      --card: rgba(0,0,0,0.03);
+      --nav-bg: rgba(255,255,255,0.92);
+      --shadow: rgba(0,0,0,0.08);
     }
 
     html { scroll-behavior: smooth; }
@@ -37,14 +51,25 @@
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
       display: flex; align-items: center; justify-content: space-between;
       padding: 20px 60px;
-      background: rgba(10,12,16,0.85);
+      background: var(--nav-bg);
       backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border);
+      transition: background .3s;
     }
     .nav-logo { font-size: 15px; font-weight: 600; letter-spacing: 0.08em; color: var(--text); }
     .nav-links { display: flex; gap: 36px; list-style: none; }
     .nav-links a { text-decoration: none; color: var(--text-sub); font-size: 13px; letter-spacing: 0.04em; transition: color .2s; }
     .nav-links a:hover { color: var(--text); }
+    .theme-toggle {
+      background: var(--card); border: 1px solid var(--border);
+      color: var(--text-sub); border-radius: 8px;
+      width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 16px; transition: all .2s; flex-shrink: 0;
+    }
+    .theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+    body, section, .expertise-card, .project-card, .client-item, .contact-email, .stat-card {
+      transition: background .3s, color .3s, border-color .3s;
+    }
 
     /* ── HERO ── */
     .hero {
@@ -305,6 +330,7 @@
     <li><a href="#projects">Projects</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
+  <button class="theme-toggle" id="themeToggle" title="다크/라이트 모드 전환">🌙</button>
 </nav>
 
 <!-- HERO -->
@@ -578,5 +604,23 @@
   <span>㈜팀에버플 대표이사</span>
 </footer>
 
+<script>
+  const toggle = document.getElementById('themeToggle');
+  const saved = localStorage.getItem('theme-hanjun');
+  if (saved === 'light') { document.documentElement.setAttribute('data-theme', 'light'); toggle.textContent = '☀️'; }
+
+  toggle.addEventListener('click', () => {
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    if (isLight) {
+      document.documentElement.removeAttribute('data-theme');
+      toggle.textContent = '🌙';
+      localStorage.setItem('theme-hanjun', 'dark');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'light');
+      toggle.textContent = '☀️';
+      localStorage.setItem('theme-hanjun', 'light');
+    }
+  });
+</script>
 </body>
 </html>
