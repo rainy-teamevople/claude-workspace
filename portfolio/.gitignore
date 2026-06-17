@@ -1,2 +1,7 @@
 # PDF에서 임시 추출한 이미지
 images/p*_Im*.png
+
+# 환경변수 (절대 커밋 금지)
+.env
+.env.local
+.env.*.local
