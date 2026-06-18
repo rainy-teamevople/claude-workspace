@@ -5,6 +5,7 @@ on:
     branches: [master]
     paths:
       - 'portfolio/**'
+      - 'todo-app/**'
 
 jobs:
   sync:
@@ -13,6 +14,17 @@ jobs:
       - name: Checkout claude-workspace
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build todo-app
+        run: |
+          cd todo-app
+          npm install
+          npm run build
+
       - name: Push portfolio to teamevople-portfolio
         run: |
           git config --global user.email "rainy@teamevople.kr"
@@ -20,16 +32,18 @@ jobs:
 
           git clone https://x-access-token:${{ secrets.PORTFOLIO_DEPLOY_TOKEN }}@github.com/rainy-teamevople/teamevople-portfolio.git /tmp/portfolio-repo
 
-          # 기존 html/이미지 파일 동기화
+          # 포트폴리오 HTML/이미지 동기화 (todo 폴더 제외하고 삭제)
           rsync -av --delete \
             --exclude='.git' \
             --exclude='.gitignore' \
             --exclude='README.md' \
+            --exclude='todo' \
             portfolio/ /tmp/portfolio-repo/
+
+          # todo-app 빌드 결과 동기화
+          rsync -av --delete todo-app/dist/ /tmp/portfolio-repo/todo/
 
           cd /tmp/portfolio-repo
           git add .
-
-          # 변경사항 있을 때만 커밋
           git diff --staged --quiet || git commit -m "sync: update from claude-workspace @ $(date -u '+%Y-%m-%d %H:%M UTC')"
           git push origin main
