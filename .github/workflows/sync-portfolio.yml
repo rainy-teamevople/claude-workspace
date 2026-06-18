@@ -11,7 +11,7 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     # [skip ci] 커밋이 트리거한 경우 무한루프 방지
-    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    if: "!contains(github.event.head_commit.message, '[skip gha]')"
     steps:
       - name: Checkout claude-workspace
         uses: actions/checkout@v4
@@ -34,7 +34,7 @@ jobs:
           mkdir -p portfolio/todo
           rsync -av --delete todo-app/dist/ portfolio/todo/
           git add portfolio/todo/
-          git diff --staged --quiet || git commit -m "chore: todo-app 빌드 결과 자동 업데이트 [skip ci]"
+          git diff --staged --quiet || git commit -m "chore: todo-app 빌드 결과 자동 업데이트 [skip gha]"
           git push origin master
 
       - name: Sync to teamevople-portfolio
