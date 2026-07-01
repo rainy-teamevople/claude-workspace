@@ -1,0 +1,22 @@
+{
+  "name": "claude-workspace",
+  "version": "1.0.0",
+  "description": "Claude Code와 함께 사용하는 개인 작업공간입니다.",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rainy-teamevople/claude-workspace.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/rainy-teamevople/claude-workspace/issues"
+  },
+  "homepage": "https://github.com/rainy-teamevople/claude-workspace#readme"
+}

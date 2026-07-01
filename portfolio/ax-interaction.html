@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Team Evople — AX Interaction Showcase</title>
+  
+  <!-- Premium Fonts -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/Paperlogy.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;700&family=Share+Tech+Mono&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet" />
+  
+  <style>
+    /* ── CORE DESIGN SYSTEM ── */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-space: #030305;
+      --bg-card: rgba(10, 10, 15, 0.4);
+      --card-border: rgba(139, 92, 246, 0.15);
+      
+      /* Glowing Theme Colors */
+      --ax-purple: 262; /* HSL hue */
+      --ax-glow: hsl(var(--ax-purple), 85%, 60%);
+      --ax-glow-glow: hsla(var(--ax-purple), 85%, 60%, 0.35);
+      --ax-glow-faint: hsla(var(--ax-purple), 85%, 60%, 0.08);
+      
+      --text-main: #f5f3ff;
+      --text-muted: #9ca3af;
+      --font-serif: "Playfair Display", "Cinzel", serif;
+      --font-sans: "Inter", "Paperlogy", sans-serif;
+      --font-mono: "Share Tech Mono", monospace;
+      
+      --glow-intensity: 1;
+      --orbit-speed: 20s;
+    }
+
+    [data-theme="light"] {
+      --bg-space: #f8fafc;
+      --bg-card: rgba(255, 255, 255, 0.7);
+      --card-border: rgba(139, 92, 246, 0.25);
+      
+      --ax-glow: hsl(var(--ax-purple), 75%, 55%);
+      --ax-glow-glow: hsla(var(--ax-purple), 75%, 55%, 0.25);
+      --ax-glow-faint: hsla(var(--ax-purple), 75%, 55%, 0.05);
+      
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background-color: var(--bg-space);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      overflow: hidden;
+      transition: background-color 0.5s ease, color 0.5s ease;
+    }
+
+    /* ── BACKGROUND SPACE DUST & GRID ── */
+    .space-background {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .space-grid {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(rgba(139, 92, 246, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(139, 92, 246, 0.03) 1px, transparent 1px);
+      background-size: 50px 50px;
+      background-position: center;
+      mask-image: radial-gradient(circle at 50% 50%, black 30%, transparent 80%);
+      -webkit-mask-image: radial-gradient(circle at 50% 50%, black 30%, transparent 80%);
+      opacity: 0.8;
+    }
+    
+    [data-theme="light"] .space-grid {
+      background-image: 
+        linear-gradient(rgba(139, 92, 246, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(139, 92, 246, 0.06) 1px, transparent 1px);
+    }
+
+    .nebula-glow {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      opacity: 0.5;
+      mix-blend-mode: screen;
+      transition: all 1s ease;
+    }
+    [data-theme="light"] .nebula-glow {
+      mix-blend-mode: multiply;
+      opacity: 0.15;
+    }
+
+    .nebula-1 {
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, rgba(59, 130, 246, 0.05) 50%, transparent 100%);
+      top: 20%;
+      left: 20%;
+      animation: floatNebula 25s infinite alternate ease-in-out;
+    }
+
+    .nebula-2 {
+      background: radial-gradient(circle, rgba(236, 72, 153, 0.1) 0%, rgba(139, 92, 246, 0.05) 60%, transparent 100%);
+      bottom: 20%;
+      right: 20%;
+      animation: floatNebula 30s infinite alternate-reverse ease-in-out;
+    }
+
+    @keyframes floatNebula {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(80px, 50px) scale(1.1); }
+    }
+
+    /* ── SCENE CONTAINER ── */
+    main {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2;
+      perspective: 1200px;
+      padding: 20px;
+    }
+
+    /* ── HEADER / NAVIGATION ── */
+    header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 30px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .back-btn {
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: color 0.3s;
+      border: 1px solid var(--card-border);
+      padding: 8px 16px;
+      border-radius: 20px;
+      background: var(--bg-card);
+      backdrop-filter: blur(8px);
+    }
+    .back-btn:hover {
+      color: var(--text-main);
+      border-color: var(--ax-glow);
+    }
+
+    .theme-toggle {
+      background: var(--bg-card);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.3s;
+      backdrop-filter: blur(8px);
+    }
+    .theme-toggle:hover {
+      border-color: var(--ax-glow);
+      box-shadow: 0 0 10px var(--ax-glow-glow);
+    }
+
+    /* ── LOGO WRAPPER / CONTAINER CARD ── */
+    .logo-showcase-card {
+      position: relative;
+      width: 100%;
+      max-width: 780px;
+      height: 480px;
+      background: var(--bg-card);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transform-style: preserve-3d;
+      will-change: transform;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      overflow: visible;
+      cursor: grab;
+    }
+    .logo-showcase-card:active {
+      cursor: grabbing;
+    }
+
+    .logo-showcase-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0) 60%, rgba(139, 92, 246, 0.03) 100%);
+      pointer-events: none;
+    }
+
+    /* HUD Frame Corners */
+    .hud-corner {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border-color: rgba(139, 92, 246, 0.4);
+      border-style: solid;
+      pointer-events: none;
+    }
+    .c-tl { top: 15px; left: 15px; border-width: 1px 0 0 1px; }
+    .c-tr { top: 15px; right: 15px; border-width: 1px 1px 0 0; }
+    .c-bl { bottom: 15px; left: 15px; border-width: 0 0 1px 1px; }
+    .c-br { bottom: 15px; right: 15px; border-width: 0 1px 1px 0; }
+
+    .card-hud-info {
+      position: absolute;
+      bottom: 20px;
+      left: 30px;
+      right: 30px;
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    /* ── BRAND LOGO INNER ── */
+    .brand-logo-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: translateZ(50px);
+      user-select: none;
+      pointer-events: none;
+    }
+
+    /* Typography representation of Team Evople */
+    .logo-text-group {
+      display: flex;
+      align-items: baseline;
+      font-family: var(--font-serif);
+      font-size: 80px;
+      font-weight: 500;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      position: relative;
+    }
+
+    .word-team {
+      display: flex;
+      align-items: baseline;
+    }
+
+    .letter-t {
+      color: #7b7b7f; /* Silver-gray tint */
+      font-family: var(--font-serif);
+      font-weight: 300;
+      font-style: italic;
+      margin-right: -2px;
+      display: inline-block;
+      transform: scaleX(1.05);
+    }
+    
+    [data-theme="light"] .letter-t {
+      color: #64748b;
+    }
+
+    .letters-eam {
+      color: var(--text-main);
+      letter-spacing: -0.06em;
+      margin-right: 18px;
+    }
+
+    .word-evople {
+      display: flex;
+      align-items: baseline;
+      position: relative;
+    }
+
+    .letter-e-capital {
+      color: var(--text-main);
+      font-weight: 600;
+      margin-right: -3px;
+    }
+
+    .letters-vople {
+      color: var(--text-main);
+      letter-spacing: -0.07em;
+    }
+
+    /* The Elegant Swoosh Curve SVG overlay */
+    .logo-swoosh-svg {
+      position: absolute;
+      top: -30px;
+      left: 175px;
+      width: 250px;
+      height: 120px;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .swoosh-path {
+      stroke: var(--text-main);
+      stroke-width: 1.2px;
+      fill: none;
+      stroke-linecap: round;
+      opacity: 0.85;
+      stroke-dasharray: 600;
+      stroke-dashoffset: 0;
+      transition: stroke 0.3s;
+    }
+
+    /* ── AX MOTIF COMPONENT (THE FOCUS) ── */
+    .ax-motif-container {
+      position: absolute;
+      /* Precisely overlay relative to "Evople" end 'e' */
+      top: -24px;
+      right: -22px;
+      width: 56px;
+      height: 56px;
+      pointer-events: auto; /* Active triggers */
+      cursor: pointer;
+      z-index: 20;
+      transform: translateZ(90px); /* Extra float for parallax */
+      transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    /* Interactive physics element */
+    .ax-motif-physics {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+    }
+
+    /* Core Glow Aura behind AX */
+    .ax-glow-aura {
+      position: absolute;
+      inset: -12px;
+      background: radial-gradient(circle, var(--ax-glow-glow) 0%, var(--ax-glow-faint) 60%, transparent 80%);
+      border-radius: 50%;
+      z-index: 1;
+      pointer-events: none;
+      animation: pulseGlow 3s infinite ease-in-out;
+      transform: translateZ(-5px);
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { transform: scale(1) translateZ(-5px); opacity: 0.8; }
+      50% { transform: scale(1.15) translateZ(-5px); opacity: 1; filter: brightness(1.2); }
+    }
+
+    /* Rotating Dotted Orbit Ring */
+    .ax-orbit-ring {
+      position: absolute;
+      inset: -8px;
+      border: 1px dashed rgba(139, 92, 246, 0.4);
+      border-radius: 50%;
+      z-index: 2;
+      pointer-events: none;
+      animation: spinOrbit var(--orbit-speed) linear infinite;
+      transform: translateZ(-2px);
+    }
+
+    .ax-orbit-planet {
+      position: absolute;
+      top: -3px;
+      left: 50%;
+      width: 6px;
+      height: 6px;
+      background-color: var(--ax-glow);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--ax-glow);
+    }
+
+    @keyframes spinOrbit {
+      from { transform: rotate(0deg) translateZ(-2px); }
+      to { transform: rotate(360deg) translateZ(-2px); }
+    }
+
+    /* Metallic Purple Main Ring Outer */
+    .ax-ring-outer {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: 
+        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15) 0%, transparent 40%),
+        linear-gradient(135deg, #a78bfa 0%, #7c3aed 30%, #4c1d95 70%, #8b5cf6 100%);
+      box-shadow: 
+        0 10px 20px rgba(0, 0, 0, 0.5),
+        inset 0 1px 1px rgba(255, 255, 255, 0.3),
+        inset 0 -2px 5px rgba(0, 0, 0, 0.6),
+        0 0 20px var(--ax-glow-faint);
+      padding: 3px; /* Border thickness */
+      z-index: 3;
+      transform: translateZ(0);
+      transition: box-shadow 0.3s, transform 0.3s;
+    }
+
+    /* Shimmer reflection shine sweep */
+    .ax-ring-outer::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: linear-gradient(135deg, transparent 35%, rgba(255, 255, 255, 0.4) 45%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 255, 255, 0.4) 55%, transparent 65%);
+      background-size: 300% 300%;
+      background-position: 0% 0%;
+      pointer-events: none;
+      z-index: 5;
+    }
+    
+    .ax-motif-container:hover .ax-ring-outer::before {
+      animation: sweepShimmer 1.5s ease-out forwards;
+    }
+
+    @keyframes sweepShimmer {
+      0% { background-position: 0% 0%; }
+      100% { background-position: 100% 100%; }
+    }
+
+    /* Glassmorphic Core Inner Circle */
+    .ax-core-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: rgba(15, 12, 30, 0.85);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
+      position: relative;
+      overflow: hidden;
+      transform: translateZ(5px);
+    }
+    
+    [data-theme="light"] .ax-core-inner {
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    /* Holographic concentric rings inside */
+    .ax-core-rings {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 1px solid rgba(139, 92, 246, 0.15);
+      pointer-events: none;
+      scale: 0.8;
+      opacity: 0.7;
+    }
+
+    /* AX Logo Text inside */
+    .ax-text {
+      font-family: var(--font-serif);
+      font-size: 20px;
+      font-weight: 500;
+      font-style: italic;
+      color: #ffffff;
+      text-shadow: 0 0 10px var(--ax-glow-glow);
+      letter-spacing: -0.02em;
+      z-index: 4;
+      user-select: none;
+      pointer-events: none;
+      transform: translateZ(10px);
+      transition: text-shadow 0.3s, scale 0.3s;
+    }
+    
+    [data-theme="light"] .ax-text {
+      color: #7c3aed;
+      text-shadow: 0 0 8px rgba(139, 92, 246, 0.2);
+    }
+
+    /* ── AX HOVER & ACTIVE MOVEMENT STATES ── */
+    .ax-motif-container:hover .ax-motif-physics {
+      transform: scale(1.12) translateZ(15px);
+    }
+
+    .ax-motif-container:hover .ax-ring-outer {
+      box-shadow: 
+        0 15px 30px rgba(0, 0, 0, 0.6),
+        inset 0 1px 1px rgba(255, 255, 255, 0.4),
+        0 0 30px var(--ax-glow);
+    }
+    
+    .ax-motif-container:active .ax-motif-physics {
+      transform: scale(0.95) translateZ(5px);
+    }
+
+    /* Canvas overlay inside AX for stellar dust particles */
+    .ax-canvas-particles {
+      position: absolute;
+      inset: -50px;
+      width: calc(100% + 100px);
+      height: calc(100% + 100px);
+      pointer-events: none;
+      z-index: 10;
+      mix-blend-mode: screen;
+    }
+
+    /* ── HUD PANEL (THE CYBER DASHBOARD) ── */
+    .hud-control-panel {
+      position: fixed;
+      top: 20px;
+      right: -420px; /* Hidden initially */
+      width: 380px;
+      height: calc(100vh - 40px);
+      background: rgba(8, 8, 12, 0.7);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      box-shadow: -10px 0 40px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      z-index: 100;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      transition: right 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .hud-control-panel.active {
+      right: 20px;
+    }
+
+    .hud-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 15px;
+    }
+
+    .hud-title {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ax-glow);
+      letter-spacing: 0.15em;
+    }
+
+    .hud-close-btn {
+      background: none;
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      transition: all 0.3s;
+    }
+    .hud-close-btn:hover {
+      border-color: var(--ax-glow);
+      color: var(--text-main);
+    }
+
+    /* Core Status Ring */
+    .hud-section-core {
+      background: rgba(139, 92, 246, 0.03);
+      border: 1px solid rgba(139, 92, 246, 0.1);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .hud-core-visual {
+      position: relative;
+      width: 70px;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hud-core-circle-svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .hud-core-circle-bg {
+      fill: none;
+      stroke: rgba(139, 92, 246, 0.1);
+      stroke-width: 4;
+    }
+
+    .hud-core-circle-val {
+      fill: none;
+      stroke: var(--ax-glow);
+      stroke-width: 4;
+      stroke-dasharray: 220;
+      stroke-dashoffset: 44; /* 80% */
+      stroke-linecap: round;
+      animation: circlePulse 3s infinite alternate ease-in-out;
+    }
+
+    @keyframes circlePulse {
+      0% { stroke-dashoffset: 44; filter: drop-shadow(0 0 2px var(--ax-glow)); }
+      100% { stroke-dashoffset: 22; filter: drop-shadow(0 0 8px var(--ax-glow)); }
+    }
+
+    .hud-core-text {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      font-weight: 700;
+      position: absolute;
+    }
+
+    .hud-core-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .hud-lbl {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .hud-val-large {
+      font-family: var(--font-mono);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    /* Interactive Slider Controls */
+    .hud-control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .slider-row {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+
+    .slider-input {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 4px;
+      background: rgba(139, 92, 246, 0.15);
+      border-radius: 2px;
+      outline: none;
+    }
+
+    .slider-input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--ax-glow);
+      cursor: pointer;
+      box-shadow: 0 0 10px var(--ax-glow);
+      transition: scale 0.2s;
+    }
+    .slider-input::-webkit-slider-thumb:hover {
+      scale: 1.25;
+    }
+
+    /* Mode Toggles */
+    .mode-toggles {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .mode-btn {
+      background: rgba(139, 92, 246, 0.05);
+      border: 1px solid rgba(139, 92, 246, 0.15);
+      border-radius: 8px;
+      color: var(--text-muted);
+      padding: 10px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      transition: all 0.3s;
+    }
+    .mode-btn:hover {
+      border-color: var(--ax-glow);
+      color: var(--text-main);
+    }
+    .mode-btn.active {
+      background: rgba(139, 92, 246, 0.15);
+      border-color: var(--ax-glow);
+      color: var(--text-main);
+      box-shadow: 0 0 12px rgba(139, 92, 246, 0.25);
+    }
+
+    /* Real-time agent console log terminal */
+    .hud-console {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(139, 92, 246, 0.1);
+      border-radius: 10px;
+      padding: 15px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #a78bfa;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+    }
+    
+    .hud-console::-webkit-scrollbar {
+      width: 4px;
+    }
+    .hud-console::-webkit-scrollbar-thumb {
+      background: rgba(139, 92, 246, 0.3);
+      border-radius: 2px;
+    }
+
+    .log-line {
+      line-height: 1.4;
+      white-space: pre-wrap;
+      opacity: 0.85;
+    }
+    .log-line.system { color: #60a5fa; }
+    .log-line.agent { color: #f472b6; }
+    .log-line.active { color: #34d399; font-weight: bold; }
+
+    /* SVG Ripple Ring expanding outwards on click */
+    .ripple-wave {
+      position: absolute;
+      border: 2px solid var(--ax-glow);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 15;
+      transform: translate(-50%, -50%);
+      opacity: 1;
+      animation: rippleAnimation 0.8s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+    }
+
+    @keyframes rippleAnimation {
+      0% {
+        width: 0px;
+        height: 0px;
+        opacity: 1;
+        box-shadow: 0 0 10px var(--ax-glow);
+      }
+      100% {
+        width: 400px;
+        height: 400px;
+        opacity: 0;
+        border-width: 0.5px;
+        box-shadow: 0 0 50px rgba(139, 92, 246, 0);
+      }
+    }
+
+    /* ── USER GUIDE TOOLTIP ── */
+    .user-instructions {
+      position: absolute;
+      bottom: 40px;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      opacity: 0.8;
+      pointer-events: none;
+      animation: pulseText 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseText {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 0.9; }
+    }
+
+    .mouse-icon {
+      width: 20px;
+      height: 30px;
+      border: 2px solid var(--text-muted);
+      border-radius: 10px;
+      position: relative;
+    }
+    .mouse-icon::after {
+      content: '';
+      position: absolute;
+      top: 5px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 6px;
+      background-color: var(--text-muted);
+      border-radius: 1px;
+      animation: mouseScroll 1.5s infinite;
+    }
+
+    @keyframes mouseScroll {
+      0% { top: 4px; opacity: 1; }
+      100% { top: 12px; opacity: 0; }
+    }
+    
+    /* Interactive status light dot */
+    .status-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--ax-glow);
+      box-shadow: 0 0 8px var(--ax-glow);
+      margin-right: 6px;
+    }
+    .status-pulse {
+      animation: blinkDot 1s infinite alternate;
+    }
+    @keyframes blinkDot {
+      from { opacity: 0.3; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BACKGROUND NEBULA GLOWS -->
+  <div class="space-background">
+    <div class="space-grid"></div>
+    <div class="nebula-glow nebula-1" id="nebula1"></div>
+    <div class="nebula-glow nebula-2" id="nebula2"></div>
+  </div>
+
+  <!-- HEADER -->
+  <header>
+    <a href="index.html" class="back-btn">
+      <span>←</span> Portfolio Home
+    </a>
+    <button class="theme-toggle" id="themeToggle" title="테마 전환">🌙</button>
+  </header>
+
+  <!-- INTERACTIVE LOGO SCENE -->
+  <main>
+    <div class="logo-showcase-card" id="logoCard">
+      <!-- HUD corners -->
+      <div class="hud-corner c-tl"></div>
+      <div class="hud-corner c-tr"></div>
+      <div class="hud-corner c-bl"></div>
+      <div class="hud-corner c-br"></div>
+      
+      <!-- Brand Logo Container -->
+      <div class="brand-logo-container">
+        
+        <!-- Typography rendering matching serif style -->
+        <div class="logo-text-group">
+          <!-- "Team" -->
+          <div class="word-team">
+            <span class="letter-t">T</span><span class="letters-eam">eam</span>
+          </div>
+          <!-- "Evople" -->
+          <div class="word-evople">
+            <span class="letter-e-capital">E</span><span class="letters-vople">vople</span>
+            
+            <!-- AX MOTIF (THE FOCUS ELEMENT) -->
+            <div class="ax-motif-container" id="axMotif">
+              <div class="ax-motif-physics" id="axPhysics">
+                <div class="ax-glow-aura" id="axGlowAura"></div>
+                <div class="ax-orbit-ring" id="axOrbitRing">
+                  <div class="ax-orbit-planet"></div>
+                </div>
+                <!-- Main Metallic Border Ring -->
+                <div class="ax-ring-outer">
+                  <!-- Glassmorphic Core inside Ring -->
+                  <div class="ax-core-inner">
+                    <div class="ax-core-rings"></div>
+                    <span class="ax-text">AX</span>
+                  </div>
+                </div>
+                <!-- Canvas Particle Emitter inside AX -->
+                <canvas class="ax-canvas-particles" id="axCanvas"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Swoosh overlay curved path -->
+        <svg class="logo-swoosh-svg" viewBox="0 0 250 120" xmlns="http://www.w3.org/2000/svg">
+          <!-- Curve starts at E serif top, sweeps above v, lands at o top -->
+          <path d="M 10,65 C 65,30 115,20 162,64" class="swoosh-path" id="swooshPath"/>
+        </svg>
+
+      </div>
+
+      <!-- HUD Bottom Readouts -->
+      <div class="card-hud-info">
+        <span>SYS.STATUS // <span class="status-dot status-pulse"></span>ACTIVE</span>
+        <span id="hudCoords">COORD // X: 0.00 Y: 0.00</span>
+        <span>EVOPLE.CORE.AX // v2.60</span>
+      </div>
+    </div>
+
+    <!-- USER INSTRUCTION GUIDE -->
+    <div class="user-instructions">
+      <div class="mouse-icon"></div>
+      <p>로고 카드를 드래그하여 회전시키고, 우측 상단의 <b>AX 버튼</b>을 클릭해 보세요.</p>
+    </div>
+  </main>
+
+  <!-- HUD DASHBOARD SLIDE-OUT PANEL -->
+  <div class="hud-control-panel" id="hudPanel">
+    <div class="hud-panel-header">
+      <h3 class="hud-title">AX PLATFORM ENGINE</h3>
+      <button class="hud-close-btn" id="hudClose" title="닫기">✕</button>
+    </div>
+
+    <!-- Cognitive Core Loop status -->
+    <div class="hud-section-core">
+      <div class="hud-core-visual">
+        <svg class="hud-core-circle-svg">
+          <circle class="hud-core-circle-bg" cx="35" cy="35" r="32"></circle>
+          <circle class="hud-core-circle-val" id="coreCircle" cx="35" cy="35" r="32"></circle>
+        </svg>
+        <span class="hud-core-text" id="corePercentage">80%</span>
+      </div>
+      <div class="hud-core-info">
+        <span class="hud-lbl">Cognitive Engine Status</span>
+        <span class="hud-val-large" id="coreStatusLabel">ACTIVE // BALANCED</span>
+      </div>
+    </div>
+
+    <!-- Interactive settings -->
+    <div class="hud-control-group">
+      <!-- Particle slider -->
+      <div class="slider-row">
+        <div class="slider-header">
+          <span>PARTICLE DENSITY (성단 입자 밀도)</span>
+          <span id="valDensity">60</span>
+        </div>
+        <input type="range" class="slider-input" id="sliderDensity" min="10" max="200" value="60" />
+      </div>
+
+      <!-- Energy slider -->
+      <div class="slider-row">
+        <div class="slider-header">
+          <span>GRAVITY FORCE (중력 흡수계수)</span>
+          <span id="valGravity">0.15</span>
+        </div>
+        <input type="range" class="slider-input" id="sliderGravity" min="0.05" max="0.5" step="0.01" value="0.15" />
+      </div>
+
+      <!-- Mode selection toggles -->
+      <div class="slider-row">
+        <span class="hud-lbl">AX ENGINE MODES</span>
+        <div class="mode-toggles">
+          <button class="mode-btn active" data-mode="balanced">BALANCED</button>
+          <button class="mode-btn" data-mode="hyperdrive">HYPERDRIVE</button>
+          <button class="mode-btn" data-mode="quantum">QUANTUM</button>
+          <button class="mode-btn" data-mode="gravity">GRAVITY WARP</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Agent cognitive log stream -->
+    <div class="hud-console" id="consoleLog">
+      <div class="log-line system">[SYS] AX cognitive core initialized successfully.</div>
+      <div class="log-line system">[SYS] Ambient particle system bound to canvas context.</div>
+      <div class="log-line agent">[AGENT] Standing by. Awaiting user interaction with AX motif...</div>
+    </div>
+  </div>
+
+  <!-- SCRIPTING FOR INTERACTIONS -->
+  <script>
+    // ── CONFIGURATION & STATE ──
+    const state = {
+      theme: 'dark',
+      density: 60,
+      gravity: 0.15,
+      mode: 'balanced', // balanced, hyperdrive, quantum, gravity
+      hudActive: false
+    };
+
+    // ── DOM ELEMENTS ──
+    const htmlEl = document.documentElement;
+    const themeBtn = document.getElementById('themeToggle');
+    const logoCard = document.getElementById('logoCard');
+    const axMotif = document.getElementById('axMotif');
+    const axPhysics = document.getElementById('axPhysics');
+    const axCanvas = document.getElementById('axCanvas');
+    const hudCoords = document.getElementById('hudCoords');
+    const hudPanel = document.getElementById('hudPanel');
+    const hudClose = document.getElementById('hudClose');
+    const consoleLog = document.getElementById('consoleLog');
+    
+    // Sliders & Dashboard inputs
+    const sliderDensity = document.getElementById('sliderDensity');
+    const valDensity = document.getElementById('valDensity');
+    const sliderGravity = document.getElementById('sliderGravity');
+    const valGravity = document.getElementById('valGravity');
+    const modeBtns = document.querySelectorAll('.mode-btn');
+    const corePercentage = document.getElementById('corePercentage');
+    const coreStatusLabel = document.getElementById('coreStatusLabel');
+    const coreCircle = document.getElementById('coreCircle');
+
+    // ── THEME MANAGER ──
+    const initTheme = () => {
+      const savedTheme = localStorage.getItem('theme-hanjun') || 'dark';
+      state.theme = savedTheme;
+      if (savedTheme === 'light') {
+        htmlEl.setAttribute('data-theme', 'light');
+        themeBtn.textContent = '☀️';
+      } else {
+        htmlEl.removeAttribute('data-theme');
+        themeBtn.textContent = '🌙';
+      }
+    };
+
+    themeBtn.addEventListener('click', () => {
+      if (state.theme === 'dark') {
+        state.theme = 'light';
+        htmlEl.setAttribute('data-theme', 'light');
+        themeBtn.textContent = '☀️';
+        localStorage.setItem('theme-hanjun', 'light');
+        addLog('System theme swapped to LIGHT mode.', 'system');
+      } else {
+        state.theme = 'dark';
+        htmlEl.removeAttribute('data-theme');
+        themeBtn.textContent = '🌙';
+        localStorage.setItem('theme-hanjun', 'dark');
+        addLog('System theme swapped to DARK mode.', 'system');
+      }
+    });
+
+    initTheme();
+
+    // ── FUTURISTIC LOG CONSOLE ──
+    const addLog = (text, type = 'agent') => {
+      const line = document.createElement('div');
+      line.className = `log-line ${type}`;
+      const time = new Date().toLocaleTimeString('en-US', { hour12: false, fractionSecondDigits: 2 });
+      line.textContent = `[${time}] ${text}`;
+      consoleLog.appendChild(line);
+      consoleLog.scrollTop = consoleLog.scrollHeight;
+      
+      // Keep only last 50 logs
+      while (consoleLog.children.length > 50) {
+        consoleLog.removeChild(consoleLog.firstChild);
+      }
+    };
+
+    // ── 3D PARALLAX TILT INTERACTION (LOGO CARD) ──
+    let cardRotation = { x: 0, y: 0 };
+    let targetCardRotation = { x: 0, y: 0 };
+    let isDragging = false;
+    let dragStart = { x: 0, y: 0 };
+    let baseRotation = { x: 5, y: -10 }; // Default attractive angle
+
+    const updateCardTilt = () => {
+      // Linear interpolation (LERP) for smooth movement
+      cardRotation.x += (targetCardRotation.x - cardRotation.x) * 0.1;
+      cardRotation.y += (targetCardRotation.y - cardRotation.y) * 0.1;
+
+      // Apply tilt to logoCard
+      logoCard.style.transform = `rotateX(${cardRotation.x}deg) rotateY(${cardRotation.y}deg)`;
+      
+      requestAnimationFrame(updateCardTilt);
+    };
+    requestAnimationFrame(updateCardTilt);
+
+    // Initial smooth set
+    targetCardRotation = { ...baseRotation };
+
+    // Mouse movement inside main container
+    document.querySelector('main').addEventListener('mousemove', (e) => {
+      if (isDragging) return;
+
+      const rect = logoCard.getBoundingClientRect();
+      const cardX = rect.left + rect.width / 2;
+      const cardY = rect.top + rect.height / 2;
+
+      // Distance from cursor to center of card
+      const dx = e.clientX - cardX;
+      const dy = e.clientY - cardY;
+
+      // Max tilt angle
+      const maxTilt = 15;
+      
+      // Calculate target tilt based on mouse position relative to window size
+      const windowWidth = window.innerWidth;
+      const windowHeight = window.innerHeight;
+      
+      const xPct = (e.clientX - windowWidth / 2) / (windowWidth / 2);
+      const yPct = (e.clientY - windowHeight / 2) / (windowHeight / 2);
+
+      targetCardRotation.x = -yPct * maxTilt;
+      targetCardRotation.y = xPct * maxTilt;
+
+      // Update Coordinate Readout in HUD
+      hudCoords.textContent = `COORD // X: ${(xPct * 100).toFixed(2)}% Y: ${(yPct * 100).toFixed(2)}%`;
+    });
+
+    // Drag-to-rotate interaction
+    logoCard.addEventListener('mousedown', (e) => {
+      // Don't drag if clicking the AX motif button
+      if (e.target.closest('#axMotif')) return;
+      isDragging = true;
+      dragStart.x = e.clientX;
+      dragStart.y = e.clientY;
+      baseRotation.x = cardRotation.x;
+      baseRotation.y = cardRotation.y;
+      logoCard.style.transition = 'none';
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const dx = e.clientX - dragStart.x;
+      const dy = e.clientY - dragStart.y;
+      
+      // Drag sensitivity
+      const sensitivity = 0.15;
+      targetCardRotation.x = baseRotation.x - dy * sensitivity;
+      targetCardRotation.y = baseRotation.y + dx * sensitivity;
+      
+      // Bound X tilt so it doesn't flip
+      targetCardRotation.x = Math.max(-30, Math.min(30, targetCardRotation.x));
+    });
+
+    window.addEventListener('mouseup', () => {
+      if (!isDragging) return;
+      isDragging = false;
+      // return to subtle default tilt or keep target
+      baseRotation = { ...targetCardRotation };
+    });
+
+    // Touch device support for card tilt
+    logoCard.addEventListener('touchstart', (e) => {
+      if (e.target.closest('#axMotif')) return;
+      isDragging = true;
+      dragStart.x = e.touches[0].clientX;
+      dragStart.y = e.touches[0].clientY;
+      baseRotation.x = cardRotation.x;
+      baseRotation.y = cardRotation.y;
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+      if (!isDragging) return;
+      const dx = e.touches[0].clientX - dragStart.x;
+      const dy = e.touches[0].clientY - dragStart.y;
+      const sensitivity = 0.2;
+      targetCardRotation.x = baseRotation.x - dy * sensitivity;
+      targetCardRotation.y = baseRotation.y + dx * sensitivity;
+      targetCardRotation.x = Math.max(-30, Math.min(30, targetCardRotation.x));
+    }, { passive: true });
+
+    window.addEventListener('touchend', () => {
+      isDragging = false;
+    });
+
+
+    // ── AX MOTIF MAGNETIC PULL INTERACTION ──
+    let axPos = { x: 0, y: 0 };
+    let targetAxPos = { x: 0, y: 0 };
+
+    window.addEventListener('mousemove', (e) => {
+      const rect = axMotif.getBoundingClientRect();
+      const axCenterX = rect.left + rect.width / 2;
+      const axCenterY = rect.top + rect.height / 2;
+
+      const dx = e.clientX - axCenterX;
+      const dy = e.clientY - axCenterY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      // Magnetic trigger range (180px)
+      const magnetRadius = 180;
+
+      if (distance < magnetRadius) {
+        // The closer the cursor is, the stronger the pull (non-linear force)
+        const power = (1 - (distance / magnetRadius)) * state.gravity;
+        targetAxPos.x = dx * power * 35; // Cap maximum displacement
+        targetAxPos.y = dy * power * 35;
+        
+        // Highlight active magnetic field
+        axMotif.style.filter = `drop-shadow(0 0 ${20 + (1 - distance/magnetRadius)*15}px var(--ax-glow))`;
+      } else {
+        targetAxPos.x = 0;
+        targetAxPos.y = 0;
+        axMotif.style.filter = '';
+      }
+    });
+
+    const updateAxPhysics = () => {
+      // Smooth interpolation for the magnetic spring effect
+      axPos.x += (targetAxPos.x - axPos.x) * 0.15;
+      axPos.y += (targetAxPos.y - axPos.y) * 0.15;
+
+      // Apply offset transform to physics wrap
+      axPhysics.style.transform = `translate3d(${axPos.x}px, ${axPos.y}px, 0)`;
+      
+      requestAnimationFrame(updateAxPhysics);
+    };
+    requestAnimationFrame(updateAxPhysics);
+
+
+    // ── CANVAS STELLAR PARTICLES SYSTEM ──
+    const ctx = axCanvas.getContext('2d');
+    let particles = [];
+
+    const resizeCanvas = () => {
+      const rect = axCanvas.getBoundingClientRect();
+      axCanvas.width = rect.width;
+      axCanvas.height = rect.height;
+    };
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Particle {
+      constructor(x, y, vx, vy, size, alpha, color) {
+        this.x = x;
+        this.y = y;
+        this.vx = vx;
+        this.vy = vy;
+        this.size = size;
+        this.alpha = alpha;
+        this.color = color;
+        this.life = 1.0;
+        this.decay = 0.01 + Math.random() * 0.015;
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        
+        // Gravity attraction back to center (AX motif center)
+        const cx = axCanvas.width / 2;
+        const cy = axCanvas.height / 2;
+        const dx = cx - this.x;
+        const dy = cy - this.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        
+        if (state.mode === 'gravity') {
+          // Gravity mode pulls particles inward in spirals
+          const force = 0.02;
+          this.vx += (dx / dist) * force;
+          this.vy += (dy / dist) * force;
+        } else if (state.mode === 'quantum') {
+          // Quantum mode makes them orbit chaoticly
+          const angle = Math.atan2(dy, dx) + Math.PI / 2;
+          this.vx += Math.cos(angle) * 0.08 + (Math.random() - 0.5) * 0.1;
+          this.vy += Math.sin(angle) * 0.08 + (Math.random() - 0.5) * 0.1;
+        } else if (state.mode === 'hyperdrive') {
+          // Hyperdrive shoots them outward fast
+          this.vx += (this.vx > 0 ? 0.05 : -0.05);
+          this.vy += (this.vy > 0 ? 0.05 : -0.05);
+        }
+
+        // Apply friction
+        this.vx *= 0.98;
+        this.vy *= 0.98;
+
+        this.life -= this.decay;
+      }
+
+      draw() {
+        ctx.save();
+        ctx.globalAlpha = this.life * this.alpha;
+        
+        // Glowing star particles
+        ctx.shadowBlur = 6;
+        ctx.shadowColor = this.color;
+        
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    const spawnParticle = () => {
+      const cx = axCanvas.width / 2;
+      const cy = axCanvas.height / 2;
+      
+      // Spawn on boundary of the AX circular motif (approx 28px radius)
+      const radius = 28;
+      const angle = Math.random() * Math.PI * 2;
+      const x = cx + Math.cos(angle) * radius;
+      const y = cy + Math.sin(angle) * radius;
+      
+      // Speeds
+      let speedFactor = 0.5;
+      if (state.mode === 'hyperdrive') speedFactor = 2.5;
+      if (state.mode === 'quantum') speedFactor = 1.2;
+      
+      // Direction
+      let vx = (Math.cos(angle) + (Math.random() - 0.5) * 0.3) * speedFactor;
+      let vy = (Math.sin(angle) + (Math.random() - 0.5) * 0.3) * speedFactor;
+      
+      const size = 1.2 + Math.random() * 2;
+      const alpha = 0.6 + Math.random() * 0.4;
+      
+      // Violet and purple color variance
+      const colorOptions = [
+        '#c084fc', // purple 400
+        '#a78bfa', // violet 400
+        '#8b5cf6', // violet 500
+        '#e879f9', // fuchsia 400
+        '#60a5fa'  // blue 400
+      ];
+      const color = colorOptions[Math.floor(Math.random() * colorOptions.length)];
+
+      particles.push(new Particle(x, y, vx, vy, size, alpha, color));
+    };
+
+    const animateParticles = () => {
+      ctx.clearRect(0, 0, axCanvas.width, axCanvas.height);
+
+      // Spawn new particles depending on hover state & density settings
+      const isHovered = axMotif.matches(':hover');
+      const spawnLimit = isHovered ? state.density * 0.4 : state.density * 0.08;
+
+      if (particles.length < spawnLimit && Math.random() < 0.8) {
+        spawnParticle();
+      }
+
+      particles = particles.filter(p => {
+        p.update();
+        if (p.life <= 0) return false;
+        p.draw();
+        return true;
+      });
+
+      requestAnimationFrame(animateParticles);
+    };
+    requestAnimationFrame(animateParticles);
+
+
+    // ── CLICK RIPPLE ENERGY WAVE & HUD PANEL TRIGGER ──
+    axMotif.addEventListener('click', (e) => {
+      const rect = axMotif.getBoundingClientRect();
+      const x = rect.left + rect.width / 2;
+      const y = rect.top + rect.height / 2;
+
+      // 1. Create Ripple Wave Node
+      const ripple = document.createElement('div');
+      ripple.className = 'ripple-wave';
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+      
+      // Color based on active mode
+      if (state.mode === 'hyperdrive') {
+        ripple.style.borderColor = '#f472b6';
+        addLog('AX Core Hyperdrive ignition activated.', 'active');
+      } else if (state.mode === 'quantum') {
+        ripple.style.borderColor = '#60a5fa';
+        addLog('AX Core Quantum entanglement state initialized.', 'active');
+      } else if (state.mode === 'gravity') {
+        ripple.style.borderColor = '#10b981';
+        addLog('AX Core Gravitational singularity collapsed.', 'active');
+      } else {
+        addLog('AX Core activation loop pinged.', 'agent');
+      }
+      
+      document.body.appendChild(ripple);
+      
+      // Clean up ripple element
+      setTimeout(() => {
+        ripple.remove();
+      }, 800);
+
+      // 2. Open / Trigger HUD control panel
+      if (!state.hudActive) {
+        state.hudActive = true;
+        hudPanel.classList.add('active');
+        addLog('AX Engine monitoring interface SLIDEOUT ACTIVE.', 'system');
+      }
+      
+      // Temporary rapid particle burst
+      const burstSize = state.mode === 'hyperdrive' ? 40 : 25;
+      for (let i = 0; i < burstSize; i++) {
+        setTimeout(spawnParticle, i * 15);
+      }
+    });
+
+    hudClose.addEventListener('click', () => {
+      state.hudActive = false;
+      hudPanel.classList.remove('active');
+      addLog('AX Engine monitoring interface TERMINATED.', 'system');
+    });
+
+    // ── HUD PANEL INTERACTIVES (SLIDERS & MODES) ──
+    
+    // 1. Density Slider
+    sliderDensity.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value);
+      state.density = val;
+      valDensity.textContent = val;
+    });
+    sliderDensity.addEventListener('change', (e) => {
+      addLog(`Cognitive node particle emission threshold adjusted to: ${state.density}`, 'system');
+    });
+
+    // 2. Gravity Slider
+    sliderGravity.addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      state.gravity = val;
+      valGravity.textContent = val.toFixed(2);
+    });
+    sliderGravity.addEventListener('change', (e) => {
+      addLog(`Magnetic gravity pull constant adjusted to: ${state.gravity}`, 'system');
+    });
+
+    // 3. Engine Mode Buttons
+    modeBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const mode = e.target.getAttribute('data-mode');
+        
+        modeBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        state.mode = mode;
+        updateEngineModeAesthetics();
+      });
+    });
+
+    const updateEngineModeAesthetics = () => {
+      const root = document.documentElement;
+      
+      if (state.mode === 'balanced') {
+        root.style.setProperty('--ax-purple', '262');
+        root.style.setProperty('--orbit-speed', '20s');
+        corePercentage.textContent = '80%';
+        coreStatusLabel.textContent = 'ACTIVE // BALANCED';
+        coreCircle.style.strokeDashoffset = '44'; // 80% of 220
+        addLog('AX engine set to BALANCED. Harmonic parameters aligned.', 'agent');
+      }
+      else if (state.mode === 'hyperdrive') {
+        root.style.setProperty('--ax-purple', '325'); // Magenta glow
+        root.style.setProperty('--orbit-speed', '4s'); // Fast spinning orbit
+        corePercentage.textContent = '99.8%';
+        coreStatusLabel.textContent = 'OVERDRIVE // HOT';
+        coreCircle.style.strokeDashoffset = '1'; // 99% of 220
+        addLog('AX engine set to HYPERDRIVE. Thermal boundaries warning!', 'agent');
+      }
+      else if (state.mode === 'quantum') {
+        root.style.setProperty('--ax-purple', '200'); // Neon Blue glow
+        root.style.setProperty('--orbit-speed', '12s');
+        corePercentage.textContent = '100%';
+        coreStatusLabel.textContent = 'ENTANGLED // COLD';
+        coreCircle.style.strokeDashoffset = '0'; // 100% of 220
+        addLog('AX engine set to QUANTUM. Entangling neural relays...', 'agent');
+      }
+      else if (state.mode === 'gravity') {
+        root.style.setProperty('--ax-purple', '150'); // Mint neon green glow
+        root.style.setProperty('--orbit-speed', '45s'); // Slow heavy spinning orbit
+        corePercentage.textContent = '65%';
+        coreStatusLabel.textContent = 'SINGULARITY // WARPING';
+        coreCircle.style.strokeDashoffset = '77'; // 65% of 220
+        addLog('AX engine set to GRAVITY WARP. Compressing space-time matrices.', 'agent');
+      }
+    };
+
+    // ── SIMULATED AUTONOMOUS AGENT ACTIONS (INTERVAL LOGS) ──
+    const agentThoughts = [
+      'Scanning cognitive canvas for user mouse vectors...',
+      'Syncing discover.py logic trees with active client database.',
+      'Swoosh vector curve interpolation optimized for Playfair serif text.',
+      'Agent experience loop (AX) responding at 60 FPS.',
+      'Analyzing user workspace files: portolio/index.html & hplan/README-ko.md...',
+      'Holographic core resonance frequencies check: nominal.',
+      'Waiting for AX click event to execute architectural layout script...',
+      'Rendering dynamic space-dust nebulae in background frames.',
+      'Agentic feedback loop active. Adapting magnetic gravity pulling coefficient.'
+    ];
+
+    setInterval(() => {
+      if (Math.random() < 0.4) {
+        const thought = agentThoughts[Math.floor(Math.random() * agentThoughts.length)];
+        addLog(`[AGENT] ${thought}`, 'agent');
+        
+        // Randomly tweak the progress metrics slightly to feel "alive"
+        if (state.hudActive && state.mode === 'balanced') {
+          const randomPercent = Math.floor(78 + Math.random() * 5);
+          corePercentage.textContent = `${randomPercent}%`;
+          coreCircle.style.strokeDashoffset = `${220 - (randomPercent/100)*220}`;
+        }
+      }
+    }, 7000);
+
+  </script>
+</body>
+</html>
